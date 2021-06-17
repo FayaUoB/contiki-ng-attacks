@@ -94,6 +94,9 @@
 struct uip_stats uip_stat;
 #endif /* UIP_STATISTICS == 1 */
 
+#if SFA == 1
+uint8_t SFA_on;
+#endif /* SELECTIVE_FORWARDING_ATTACK == 1 */
 /*---------------------------------------------------------------------------*/
 /**
  * \name Layer 2 variables
@@ -1254,6 +1257,10 @@ uip_process(uint8_t flag)
       LOG_INFO_6ADDR(&UIP_IP_BUF->destipaddr);
       LOG_INFO_("\n");
       UIP_STAT(++uip_stat.ip.forwarded);
+      #if SFA == 1
+      if(SFA_on && UIP_ICMP_BUF->type != 155)
+        goto drop;
+      #endif
       goto send;
     } else {
       if((uip_is_addr_linklocal(&UIP_IP_BUF->srcipaddr)) &&

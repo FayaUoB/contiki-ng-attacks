@@ -55,6 +55,11 @@
 
 #define UIP_ICMP6_ERROR_BUF  ((struct uip_icmp6_error *)UIP_ICMP_PAYLOAD)
 
+#if SYA == 1
+uint8_t SYA_on;
+uint8_t fake_id;
+#endif /* SYBIL ATTACK */
+
 /** \brief temporary IP address */
 static uip_ipaddr_t tmp_ipaddr;
 
@@ -243,6 +248,28 @@ uip_icmp6_send(const uip_ipaddr_t *dest, int type, int code, int payload_len)
 
   memcpy(&UIP_IP_BUF->destipaddr, dest, sizeof(*dest));
   uip_ds6_select_src(&UIP_IP_BUF->srcipaddr, &UIP_IP_BUF->destipaddr);
+
+#if SYA == 1
+if(SYA_on){
+    linkaddr_t fladdr;
+    memset(&fladdr, 0, sizeof(linkaddr_t));
+    for(int i = 0; i < sizeof(uip_lladdr.addr); i += 2) {
+      fladdr.u8[i + 1] = fake_id & 0xff;
+      fladdr.u8[i + 0] = fake_id >> 8;
+    }
+    linkaddr_set_node_addr(&fladdr);
+    LOG_INFO("Fake Node ID: %u\n", fake_id);
+    LOG_INFO("Link-layer address: ");
+    LOG_INFO_LLADDR(&linkaddr_node_addr);
+    LOG_INFO_("\n");
+    memcpy(&uip_lladdr.addr, &linkaddr_node_addr, sizeof(uip_lladdr.addr));
+    uip_create_linklocal_prefix(&UIP_IP_BUF->srcipaddr);
+    uip_ds6_set_addr_iid(&UIP_IP_BUF->srcipaddr, &uip_lladdr);
+    LOG_INFO("srcipaddr: ");
+    LOG_INFO_6ADDR(&UIP_IP_BUF->srcipaddr);
+    LOG_INFO_("\n");
+}
+#endif
 
   UIP_ICMP_BUF->type = type;
   UIP_ICMP_BUF->icode = code;

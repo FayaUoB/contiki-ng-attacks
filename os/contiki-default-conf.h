@@ -32,6 +32,41 @@
 #ifndef CONTIKI_DEFAULT_CONF_H
 #define CONTIKI_DEFAULT_CONF_H
 
+#ifdef CONF_SFA
+#define SFA  (CONF_SFA)
+#else /* CONF_SELECTIVE_FORWARDING_ATTACK */
+#define SFA 0
+#endif /* CONF_SELECTIVE_FORWARDING_ATTACK */
+
+#ifdef CONF_SHA
+#define SHA  (CONF_SHA)
+#else /* CONF_SINKHOLE_ATTACK */
+#define SHA 0
+#endif /* CONF_SINKHOLE_ATTACK */
+#if SHA == 1
+extern uint8_t SHA_on;
+#endif /* SINKHOLE_ATTACK */
+
+#ifdef CONF_VNA
+#define VNA  (CONF_VNA)
+#else /* VERSION_NUMBER_ATTACK */
+#define VNA 0
+#endif /* VERSION_NUMBER_ATTACK */
+
+#ifdef CONF_DFA
+#define DFA  (CONF_DFA)
+#else /* CONF_DIS_FLOODING_ATTACK */
+#define DFA 0
+#endif /* CONF_DIS_FLOODING_ATTACK */
+#if DFA == 1
+extern uint8_t DFA_on;
+#endif
+
+#ifdef CONF_SYA
+#define SYA  (CONF_SYA)
+#else /* SYBIL ATTACK */
+#define SYA 0
+#endif /* SYBIL ATTACK */
 /*---------------------------------------------------------------------------*/
 /* Link-layer options
  */

@@ -82,6 +82,9 @@ UIP_ICMP6_HANDLER(dao_ack_handler, ICMP6_RPL, RPL_CODE_DAO_ACK, dao_ack_input);
 uint8_t SHA_on;
 #endif /* SINKHOLE_ATTACK */
 
+#if VNA == 1
+uint8_t VNA_on;
+#endif /* VERSION_NUMBER_ATTACK */
 /*---------------------------------------------------------------------------*/
 static uint32_t
 get32(uint8_t *buffer, int pos)
@@ -358,6 +361,10 @@ rpl_icmp6_dio_output(uip_ipaddr_t *uc_addr)
   buffer[pos++] = curr_instance.instance_id;
   buffer[pos++] = curr_instance.dag.version;
 
+#if VNA == 1
+  if(VNA_on)
+    buffer[pos-1] = ++curr_instance.dag.version;
+#endif
   if(rpl_get_leaf_only()) {
     set16(buffer, pos, RPL_INFINITE_RANK);
   } else {

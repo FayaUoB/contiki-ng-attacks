@@ -599,6 +599,10 @@ process_dio_init_dag(rpl_dio_t *dio)
 void
 rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
 {
+#if DFA == 1
+  if(DFA_on)
+    rpl_timers_schedule_periodic_dis();
+#endif
   if(!curr_instance.used && !rpl_dag_root_is_root()) {
     /* Attempt to init our DAG from this DIO */
     if(!process_dio_init_dag(dio)) {

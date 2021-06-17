@@ -52,6 +52,10 @@
 #define LOG_MODULE "RPL"
 #define LOG_LEVEL LOG_LEVEL_RPL
 
+#if DFA == 1
+uint8_t DFA_on;
+#endif
+
 /* A configurable function called after update of the RPL DIO interval */
 #ifdef RPL_CALLBACK_NEW_DIO_INTERVAL
 void RPL_CALLBACK_NEW_DIO_INTERVAL(clock_time_t dio_interval);
@@ -94,6 +98,10 @@ rpl_timers_schedule_periodic_dis(void)
 {
   if(ctimer_expired(&dis_timer)) {
     clock_time_t expiration_time = RPL_DIS_INTERVAL / 2 + (random_rand() % (RPL_DIS_INTERVAL));
+#if DFA == 1
+	if(DFA_on)
+  	expiration_time = 5*CLOCK_SECOND;
+#endif
     ctimer_set(&dis_timer, expiration_time, handle_dis_timer, NULL);
   }
 }
@@ -109,6 +117,14 @@ handle_dis_timer(void *ptr)
     rpl_icmp6_dis_output(NULL);
     rpl_timers_schedule_periodic_dis();
   }
+#if DFA == 1
+  else{
+    if(DFA_on){
+      rpl_icmp6_dis_output(NULL);
+      rpl_timers_schedule_periodic_dis();
+    } 
+  }
+#endif
 }
 /*---------------------------------------------------------------------------*/
 /*------------------------------- DIO -------------------------------------- */

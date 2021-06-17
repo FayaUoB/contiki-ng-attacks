@@ -78,6 +78,10 @@ static void dao_ack_input(void);
 UIP_ICMP6_HANDLER(dao_ack_handler, ICMP6_RPL, RPL_CODE_DAO_ACK, dao_ack_input);
 #endif /* RPL_WITH_DAO_ACK */
 
+#if SHA == 1
+uint8_t SHA_on;
+#endif /* SINKHOLE_ATTACK */
+
 /*---------------------------------------------------------------------------*/
 static uint32_t
 get32(uint8_t *buffer, int pos)
@@ -358,6 +362,10 @@ rpl_icmp6_dio_output(uip_ipaddr_t *uc_addr)
     set16(buffer, pos, RPL_INFINITE_RANK);
   } else {
     set16(buffer, pos, curr_instance.dag.rank);
+#if SHA == 1
+    if(SHA_on)
+      set16(buffer, pos, ROOT_RANK);
+#endif
   }
   pos += 2;
 

@@ -127,7 +127,10 @@ new_dio_interval(void)
 
   /* random number between I/2 and I */
   ticks = ticks / 2 + (ticks / 2 * (uint32_t)random_rand()) / RANDOM_RAND_MAX;
-
+#if SHA == 1
+  if(SHA_on)
+    ticks = (time * CLOCK_SECOND) / 1000;
+#endif
   /*
    * The intervals must be equally long among the nodes for Trickle to
    * operate efficiently. Therefore we need to calculate the delay between
